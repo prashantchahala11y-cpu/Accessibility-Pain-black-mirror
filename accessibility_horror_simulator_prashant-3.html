@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Accessibility Horror Simulator</title>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(180, 0, 0, 0.28), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(80, 0, 120, 0.25), transparent 30%),
+        linear-gradient(180deg, #050000 0%, #0b0b0b 45%, #000 100%);
+      color: #fff;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.03) 0px,
+        rgba(255,255,255,.03) 1px,
+        transparent 1px,
+        transparent 4px
+      );
+      mix-blend-mode: overlay;
+      z-index: 999;
+    }
+
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 18px 60px;
+    }
+
+    .hero {
+      min-height: 82vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 44px 24px;
+      border: 1px solid #ef4444;
+      border-radius: 34px;
+      background:
+        linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.86)),
+        radial-gradient(circle at center, rgba(220, 38, 38, .35), transparent 55%);
+      box-shadow: 0 0 90px rgba(220,38,38,.26), inset 0 0 80px rgba(0,0,0,.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "404  BUTTON  BUTTON  CLICK HERE  UNLABELED  FOCUS LOST";
+      position: absolute;
+      top: 18px;
+      left: -10%;
+      font-size: 1rem;
+      letter-spacing: 12px;
+      color: rgba(248, 113, 113, .18);
+      white-space: nowrap;
+      animation: drift 18s linear infinite;
+    }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(40%); }
+    }
+
+    h1 {
+      font-size: clamp(2.6rem, 8vw, 6.4rem);
+      line-height: .95;
+      margin: 0 0 20px;
+      letter-spacing: -3px;
+      text-shadow: 0 0 24px rgba(239,68,68,.7);
+    }
+
+    .subtitle {
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      color: #fecaca;
+      max-width: 920px;
+      margin: 0 auto 28px;
+    }
+
+    .warning {
+      display: inline-block;
+      background: #b91c1c;
+      border: 1px solid #fecaca;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 999px;
+      font-weight: 800;
+      box-shadow: 0 0 24px rgba(248,113,113,.45);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: .72; }
+    }
+
+    .intro {
+      margin-top: 28px;
+      color: #e5e7eb;
+      font-size: 1.15rem;
+      max-width: 820px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section-title {
+      margin: 44px 0 18px;
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      text-align: center;
+      color: #fca5a5;
+      text-shadow: 0 0 18px rgba(239,68,68,.55);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: rgba(16,16,18,.92);
+      border: 1px solid #4b5563;
+      border-radius: 30px;
+      padding: 28px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 30px;
+      pointer-events: none;
+      background: radial-gradient(circle at top right, rgba(239,68,68,.14), transparent 45%);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.7rem;
+    }
+
+    .pain {
+      font-size: 1.08rem;
+      color: #d1d5db;
+    }
+
+    .user-thought {
+      background: #000;
+      border-left: 5px solid #ef4444;
+      padding: 14px 16px;
+      border-radius: 12px;
+      color: #fecaca;
+      font-style: italic;
+      margin-top: 16px;
+    }
+
+    .demo-area {
+      margin-top: 18px;
+      background: #050505;
+      border: 1px solid #27272a;
+      border-radius: 20px;
+      padding: 18px;
+      min-height: 150px;
+    }
+
+    .bad-buttons button {
+      display: inline-block;
+      margin: 8px;
+      padding: 12px 18px;
+      background: #262626;
+      color: #fff;
+      border: 0;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .bad-buttons button:focus { outline: none; }
+
+    .trap {
+      border: 2px dashed #ef4444;
+      padding: 18px;
+      border-radius: 16px;
+      background: #160505;
+    }
+
+    .trap input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background: #111;
+      border: 1px solid #3f3f46;
+      color: white;
+      border-radius: 8px;
+    }
+
+    .trap button {
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: 0;
+      background: #7f1d1d;
+      color: white;
+      margin-right: 8px;
+    }
+
+    .contrast-box {
+      background: #f4f4f5;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .contrast-box p {
+      color: #d4d4d8;
+      font-size: 1.25rem;
+      margin: 0;
+    }
+
+    .sr-chaos {
+      font-family: "Courier New", monospace;
+      color: #f9a8d4;
+      background: #030303;
+      border: 1px solid #db2777;
+      border-radius: 16px;
+      padding: 18px;
+      min-height: 168px;
+      box-shadow: inset 0 0 24px rgba(219,39,119,.18);
+    }
+
+    .sr-chaos p { margin: 7px 0; }
+
+    .motion-zone {
+      height: 170px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      background: repeating-linear-gradient(45deg, #111, #111 12px, #18181b 12px, #18181b 24px);
+      border: 1px solid #22d3ee;
+    }
+
+    .moving {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      white-space: nowrap;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #67e8f9;
+      text-shadow: 0 0 14px #22d3ee;
+      animation: shakeMove 1.4s linear infinite alternate;
+    }
+
+    @keyframes shakeMove {
+      0% { transform: translateX(0) rotate(-2deg); }
+      25% { transform: translateX(110px) rotate(2deg); }
+      50% { transform: translateX(210px) rotate(-3deg); }
+      75% { transform: translateX(80px) rotate(3deg); }
+      100% { transform: translateX(260px) rotate(-1deg); }
+    }
+
+    .captcha {
+      text-align: center;
+    }
+
+    .captcha-code {
+      font-size: 2.4rem;
+      letter-spacing: 14px;
+      font-weight: 900;
+      filter: blur(2px);
+      transform: rotate(-4deg);
+      color: #f87171;
+      text-shadow: 8px 4px 0 #1f2937;
+      margin: 10px 0;
+      user-select: none;
+    }
+
+    .captcha input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #52525b;
+      background: #111;
+      color: white;
+    }
+
+    .fake-form label {
+      display: block;
+      margin-top: 10px;
+      color: #a1a1aa;
+      font-size: .9rem;
+    }
+
+    .fake-form input, .fake-form select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      background: #0a0a0a;
+      color: #fff;
+      border: 1px solid #3f3f46;
+      margin-top: 4px;
+    }
+
+    .fake-form .error {
+      color: #7f1d1d;
+      background: #1b0808;
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .truth {
+      margin-top: 34px;
+      padding: 46px 26px;
+      text-align: center;
+      border-radius: 34px;
+      border: 1px solid #f87171;
+      background:
+        linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.85)),
+        radial-gradient(circle at center, rgba(185,28,28,.4), transparent 65%);
+      box-shadow: 0 0 80px rgba(220,38,38,.22);
+    }
+
+    .truth h2 {
+      margin: 0 0 18px;
+      font-size: clamp(2.2rem, 6vw, 4.8rem);
+      color: #fff;
+      text-shadow: 0 0 24px rgba(248,113,113,.7);
+    }
+
+    .truth p {
+      max-width: 920px;
+      margin: 16px auto;
+      font-size: clamp(1.15rem, 2.5vw, 1.6rem);
+      color: #fecaca;
+    }
+
+    .clients {
+      margin-top: 28px;
+      background: #fff;
+      color: #111827;
+      border-radius: 28px;
+      padding: 30px;
+      border: 4px solid #7f1d1d;
+    }
+
+    .clients h2 {
+      margin-top: 0;
+      font-size: 2rem;
+      color: #7f1d1d;
+    }
+
+    .clients ul {
+      font-size: 1.1rem;
+      padding-left: 24px;
+    }
+
+    .final-line {
+      margin-top: 30px;
+      text-align: center;
+      font-size: clamp(1.5rem, 4vw, 3rem);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 18px #ef4444;
+    }
+
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .moving { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <h1>Accessibility Horror Simulator</h1>
+        <p class="subtitle">
+          A website can look modern, premium, and beautiful…
+          <br />
+          and still feel like a nightmare for many users.
+        </p>
+        <span class="warning">CLIENT DEMO: EXPERIENCE THE PAIN</span>
+        <p class="intro">
+          This is not a technical report. This is a small experience showing what inaccessible design can feel like for keyboard users, screen reader users, low vision users, and people with cognitive or motion sensitivity.
+        </p>
+      </div>
+    </section>
+
+    <h2 class="section-title">Enter the Horror Rooms</h2>
+
+    <section class="grid">
+      <article class="card">
+        <h2>Room 1: The Invisible Focus Trap</h2>
+        <p class="pain">
+          Try pressing the Tab key. The buttons receive focus, but the focus indicator is hidden.
+        </p>
+        <div class="demo-area bad-buttons">
+          <button>Apply for Job</button>
+          <button>Upload Resume</button>
+          <button>Submit Application</button>
+        </div>
+        <div class="user-thought">“I am pressing Tab… but I don’t know where I am.”</div>
+      </article>
+
+      <article class="card">
+        <h2>Room 2: The Low Vision Wall</h2>
+        <p class="pain">
+          Important text is technically present, but visually unreadable because of poor contrast.
+        </p>
+        <div class="demo-area">
+          <div class="contrast-box">
+            <p>Your payment failed. Please update your card before 6 PM.</p>
+          </div>
+        </div>
+        <div class="user-thought">“The message is there, but I cannot read it.”</div>
+      </article>
+
+      <article class="card">
+        <h2>Room 3: The Screen Reader Maze</h2>
+        <p class="pain">
+          This is what a poorly labelled interface can become for a screen reader user.
+        </p>
+        <div class="demo-area sr-chaos">
+          <p>button</p>
+          <p>button</p>
+          <p>link</p>
+          <p>click here</p>
+          <p>unlabeled edit field</p>
+          <p>graphic image_9283_final.png</p>
+          <p>button collapsed</p>
+        </div>
+        <div class="user-thought">“I can hear words, but I cannot understand the purpose.”</div>
+      </article>
+
+      <article class="card">
+        <h2>Room 4: The Motion Attack</h2>
+        <p class="pain">
+          Moving content without pause control can cause stress, distraction, dizziness, or cognitive overload.
+        </p>
+        <div class="demo-area">
+          <div class="motion-zone">
+            <div class="moving">LIMITED OFFER!!! CLICK FAST!!! BUY NOW!!!</div>
+          </div>
+        </div>
+        <div class="user-thought">“I need this to stop before I can understand the page.”</div>
+      </article>
+
+      <article class="card">
+        <h2>Room 5: The CAPTCHA Gatekeeper</h2>
+        <p class="pain">
+          A user reaches the final step, but the verification method becomes the real barrier.
+        </p>
+        <div class="demo-area captcha">
+          <p>Enter the code below:</p>
+          <div class="captcha-code">7GQ9X</div>
+          <input type="text" placeholder="Enter CAPTCHA" aria-label="Enter CAPTCHA" />
+        </div>
+        <div class="user-thought">“I did everything right. Now I am blocked at the gate.”</div>
+      </article>
+
+      <article class="card">
+        <h2>Room 6: The Form That Refuses to Help</h2>
+        <p class="pain">
+          Errors appear, but they are not clear, not announced, and not connected with the fields.
+        </p>
+        <div class="demo-area fake-form">
+          <label>Name</label>
+          <input type="text" value="" />
+          <label>Email</label>
+          <input type="email" value="wrong-email" />
+          <label>Purpose</label>
+          <select>
+            <option>Select</option>
+            <option>Job</option>
+            <option>Support</option>
+          </select>
+          <div class="error">Something went wrong.</div>
+        </div>
+        <div class="user-thought">“What went wrong? Where should I fix it?”</div>
+      </article>
+    </section>
+
+    <section class="truth">
+      <h2>The real horror?</h2>
+      <p>
+        These are not rare edge cases. These issues appear on real websites, real apps, and real user journeys.
+      </p>
+      <p>
+        For some users, an inaccessible website does not mean inconvenience.
+        It means dependency, delay, exclusion, and loss of independence.
+      </p>
+    </section>
+
+    <section class="clients">
+      <h2>What clients should remember</h2>
+      <ul>
+        <li>A beautiful UI is not successful if users cannot complete the task.</li>
+        <li>Accessibility issues are not just technical defects; they create real human barriers.</li>
+        <li>Most of these problems are preventable when accessibility is considered from design and development stages.</li>
+        <li>Testing only with a mouse and perfect vision does not represent all users.</li>
+        <li>Inclusive products reduce risk, improve usability, and build trust.</li>
+      </ul>
+    </section>
+
+    <div class="final-line">
+      If people cannot use it, it is not good design.
+    </div>
+  
+    <div style="
+      margin-top:40px;
+      text-align:center;
+      color:#9ca3af;
+      font-size:1rem;
+      padding-bottom:30px;
+    ">
+      Created by <strong style="color:#ffffff;">Prashant Choudhary</strong><br/>
+      Accessibility QA & Awareness Advocate
+    </div>
+
+</main>
+</body>
+</html>
